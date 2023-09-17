@@ -1,27 +1,27 @@
 import { Address, Enrollment } from '@prisma/client';
+import { AxiosResponse } from 'axios';
 import { request } from '@/utils/request';
 import { invalidDataError, notFoundError } from '@/errors';
 import { addressRepository, CreateAddressParams, enrollmentRepository, CreateEnrollmentParams } from '@/repositories';
 import { exclude } from '@/utils/prisma-utils';
 import { CepInfo } from '@/protocols';
-import { AxiosResponse } from 'axios';
 
 async function getAddressFromCEP(cep: string) {
   const result: AxiosResponse<CepInfo> = await request.get(`${process.env.VIA_CEP_API}/${cep}/json/`);
 
-  if(result.data.erro === true) {
-    throw invalidDataError("The given CEP doesn't match any valid CEP")
+  if (result.data.erro === true) {
+    throw invalidDataError("The given CEP doesn't match any valid CEP");
   }
 
-  const { logradouro, complemento, bairro, localidade, uf} = result.data
+  const { logradouro, complemento, bairro, localidade, uf } = result.data;
 
-  return {logradouro, complemento, bairro, cidade: localidade, uf};
+  return { logradouro, complemento, bairro, cidade: localidade, uf };
 }
 
 async function getOneWithAddressByUserId(userId: number): Promise<GetOneWithAddressByUserIdResult> {
   const enrollmentWithAddress = await enrollmentRepository.findWithAddressByUserId(userId);
 
-  if (!enrollmentWithAddress) throw invalidDataError("Enrollments must contain an address");
+  if (!enrollmentWithAddress) throw invalidDataError('Enrollments must contain an address');
 
   const [firstAddress] = enrollmentWithAddress.Address;
   const address = getFirstAddress(firstAddress);
@@ -48,7 +48,7 @@ async function createOrUpdateEnrollmentWithAddress(params: CreateOrUpdateEnrollm
   const address = getAddressForUpsert(params.address);
 
   // TODO - Verificar se o CEP é válido antes de associar ao enrollment.
-  await getAddressFromCEP(address.cep.replace("-", ""))
+  await getAddressFromCEP(address.cep.replace('-', ''));
 
   const newEnrollment = await enrollmentRepository.upsert(params.userId, enrollment, exclude(enrollment, 'userId'));
 
