@@ -29,4 +29,4 @@ export type CEP = {
 
 export type CreateTicket = {
   ticketTypeId: number;
-}
+};
