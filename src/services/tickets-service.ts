@@ -18,7 +18,20 @@ async function getTicket(userId: number){
     }
 }
 
+async function postTicket(userId: number, ticketTypeId: number){
+    const enrollment = await ticketRepository.getEnrollment(userId)
+    if(!enrollment) throw notFoundError()
+    const type = await ticketRepository.getType(ticketTypeId)
+    if(!type) throw notFoundError()
+    const ticket = await ticketRepository.postTicket(ticketTypeId, enrollment.id)
+    return{
+        ...ticket,
+        TicketType: type,
+    }
+}
+
 export const ticketService = {
     getTypes,
     getTicket,
+    postTicket,
 };
