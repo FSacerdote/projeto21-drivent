@@ -10,6 +10,7 @@ async function getHotels(userId: number){
     if(!ticket.TicketType.includesHotel || ticket.TicketType.isRemote || ticket.status !== "PAID") throw paymentRequiredError()
 
     const hotels = await hotelsRepository.getHotels()
+    if(hotels.length === 0) throw notFoundError()
     return hotels 
 }
 
