@@ -1,50 +1,56 @@
+import { TicketStatus } from '@prisma/client';
 import { prisma } from '@/config';
+import { CreateTicketParams } from '@/protocols';
 
-async function getTypes() {
-  const types = await prisma.ticketType.findMany();
-  return types;
+async function findTicketTypes() {
+  const result = await prisma.ticketType.findMany();
+  return result;
 }
 
-async function getTicket(enrollmentId: number) {
-  const ticket = await prisma.ticket.findFirst({
+async function findTicketByEnrollmentId(enrollmentId: number) {
+  const result = await prisma.ticket.findUnique({
+    where: { enrollmentId },
+    include: { TicketType: true },
+  });
+
+  return result;
+}
+
+async function createTicket(ticket: CreateTicketParams) {
+  const result = await prisma.ticket.create({
+    data: ticket,
+    include: { TicketType: true },
+  });
+
+  return result;
+}
+
+async function findTicketById(ticketId: number) {
+  const result = await prisma.ticket.findUnique({
+    where: { id: ticketId },
+    include: { TicketType: true },
+  });
+
+  return result;
+}
+
+async function ticketProcessPayment(ticketId: number) {
+  const result = prisma.ticket.update({
     where: {
-      enrollmentId,
+      id: ticketId,
     },
-  });
-  return ticket;
-}
-
-async function getEnrollment(userId: number) {
-  const enrollment = await prisma.enrollment.findUnique({
-    where: { userId },
-  });
-  return enrollment;
-}
-
-async function getType(typeId: number) {
-  const type = await prisma.ticketType.findUnique({
-    where: {
-      id: typeId,
-    },
-  });
-  return type;
-}
-
-async function postTicket(ticketTypeId: number, enrollmentId: number) {
-  const ticket = await prisma.ticket.create({
     data: {
-      ticketTypeId,
-      enrollmentId,
-      status: 'RESERVED',
+      status: TicketStatus.PAID,
     },
   });
-  return ticket;
+
+  return result;
 }
 
-export const ticketRepository = {
-  getTypes,
-  getTicket,
-  getEnrollment,
-  getType,
-  postTicket,
+export const ticketsRepository = {
+  findTicketTypes,
+  findTicketByEnrollmentId,
+  createTicket,
+  findTicketById,
+  ticketProcessPayment,
 };
