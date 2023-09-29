@@ -54,10 +54,10 @@ export function handleApplicationErrors(
     return res.sendStatus(httpStatus.BAD_REQUEST);
   }
 
-  if(err.name === 'PaymentRequiredError') {
+  if (err.name === 'PaymentRequiredError') {
     return res.sendStatus(httpStatus.PAYMENT_REQUIRED).send({
-      message: err.message
-    })
+      message: err.message,
+    });
   }
 
   if (err.name === 'InvalidCEPError') {

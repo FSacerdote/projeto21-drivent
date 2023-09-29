@@ -1,8 +1,8 @@
-import { ApplicationError } from "@/protocols";
+import { ApplicationError } from '@/protocols';
 
-export function paymentRequiredError(): ApplicationError{
-    return {
-        name: "PaymentRequiredError",
-        message: "Payment required, or invalid ticket type"
-    }
+export function paymentRequiredError(): ApplicationError {
+  return {
+    name: 'PaymentRequiredError',
+    message: 'Payment required, or invalid ticket type',
+  };
 }
