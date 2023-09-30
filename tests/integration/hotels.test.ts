@@ -6,6 +6,7 @@ import { createEnrollmentWithAddress, createTicket, createTicketType, createUser
 import { cleanDb, generateValidToken } from '../helpers';
 import { createHotel } from '../factories/hotels-factory';
 import app, { init } from '@/app';
+import { prisma } from '@/config';
 
 beforeAll(async () => {
   await init();
@@ -205,6 +206,23 @@ describe('GET /hotels/:hotelId', () => {
       await createTicket(enrollment.id, ticketType.id, 'PAID');
 
       const result = await server.get('/hotels/banana').set('Authorization', `Bearer ${token}`);
+      expect(result.status).toBe(httpStatus.NOT_FOUND);
+    });
+
+    it('Should return 404 if the id is valid but doesnt exist', async () => {
+      const user = await createUser();
+      const hotel = await createHotel();
+
+      const token = await generateValidToken(user);
+      const enrollment = await createEnrollmentWithAddress(user);
+      const ticketType = await createTicketType(false, true);
+      await createTicket(enrollment.id, ticketType.id, 'PAID');
+      await prisma.hotel.delete({
+        where: {
+          id: hotel.id
+        }
+      })
+      const result = await server.get(`/hotels/${hotel.id}`).set('Authorization', `Bearer ${token}`);
       expect(result.status).toBe(httpStatus.NOT_FOUND);
     });
 
