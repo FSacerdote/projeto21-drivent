@@ -219,9 +219,9 @@ describe('GET /hotels/:hotelId', () => {
       await createTicket(enrollment.id, ticketType.id, 'PAID');
       await prisma.hotel.delete({
         where: {
-          id: hotel.id
-        }
-      })
+          id: hotel.id,
+        },
+      });
       const result = await server.get(`/hotels/${hotel.id}`).set('Authorization', `Bearer ${token}`);
       expect(result.status).toBe(httpStatus.NOT_FOUND);
     });
