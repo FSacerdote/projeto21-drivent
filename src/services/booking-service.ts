@@ -25,7 +25,20 @@ async function postBooking(userId: number, roomId: number){
     return bookingId
 }
 
+async function putBooking(userId: number, roomId: number, bookingId: number){
+    const originalBooking = await bookingRepository.getBookingByUserId(userId)
+    const room = await bookingRepository.getRoomById(roomId)
+    const count = await bookingRepository.countBookingsByRoom(roomId)
+
+    if(!originalBooking) throw forbiddenError()
+    if(!room) throw notFoundError()
+    if(room.capacity <= count) throw forbiddenError()
+
+    await bookingRepository.updateBooking(roomId, bookingId)
+}
+
 export const bookingService={
     getBookingByUserId,
-    postBooking
+    postBooking,
+    putBooking
 }

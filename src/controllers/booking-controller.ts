@@ -18,3 +18,13 @@ export async function postBooking(req: AuthenticatedRequest, res: Response){
 
     res.send({bookingId})
 }
+
+export async function putBooking(req: AuthenticatedRequest, res: Response){
+    const { userId } = req
+    const { roomId } = req.body
+    const { bookingId } = req.params
+
+    await bookingService.putBooking(userId, roomId, Number(bookingId))
+
+    res.send({bookingId})
+}
