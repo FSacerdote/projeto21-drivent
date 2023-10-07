@@ -17,7 +17,7 @@ async function postBooking(userId: number, roomId: number){
     const ticketType = ticket.TicketType
 
     if(room.capacity <= count) throw forbiddenError()
-    if(!room) throw notFoundError
+    if(!room) throw notFoundError()
     if(!enrollment || !ticket || ticketType.isRemote || ticketType.includesHotel === false || ticket.status === 'RESERVED') throw forbiddenError()
 
 

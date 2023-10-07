@@ -16,7 +16,9 @@ export async function postBooking(req: AuthenticatedRequest, res: Response){
 
     const bookingId = await bookingService.postBooking(userId, roomId)
 
-    res.send({bookingId})
+    res.send({bookingId:{
+        id: bookingId
+    }})
 }
 
 export async function putBooking(req: AuthenticatedRequest, res: Response){
@@ -26,5 +28,5 @@ export async function putBooking(req: AuthenticatedRequest, res: Response){
 
     await bookingService.putBooking(userId, roomId, Number(bookingId))
 
-    res.send({bookingId})
+    res.send({bookingId: Number(bookingId)})
 }
