@@ -1,12 +1,11 @@
-import { prisma } from "@/config";
-import { Room, User } from "@prisma/client";
+import { Room, User } from '@prisma/client';
+import { prisma } from '@/config';
 
-
-export async function createBooking(user: User, room: Room){
-    return prisma.booking.create({
-        data: {
-            userId: user.id,
-            roomId: room.id
-        }
-    })
+export async function createBooking(user: User, room: Room) {
+  return prisma.booking.create({
+    data: {
+      userId: user.id,
+      roomId: room.id,
+    },
+  });
 }
