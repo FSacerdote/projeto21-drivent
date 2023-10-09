@@ -43,7 +43,7 @@ describe("GET /booking", ()=> {
 
 describe("POST /booking", ()=> {
 
-    it("Should respond with status 404 room doenst exist", async ()=>{
+    it("Should respond with status 404 if room doenst exist", async ()=>{
 
         jest.spyOn(bookingRepository, "getRoomById").mockImplementationOnce((): any => {
             return undefined
@@ -210,4 +210,79 @@ describe("POST /booking", ()=> {
         })
 
     })
+})
+
+describe("PUT /booking", ()=> {
+
+    it("Should respond with status 403 if booking doesnt exist", async ()=>{
+
+        jest.spyOn(bookingRepository, "getRoomById").mockImplementationOnce((): any => {
+            return {
+                capacity: 4
+            }
+        })
+        jest.spyOn(bookingRepository, "countBookingsByRoom").mockImplementationOnce((): any => {
+            return 2;
+        })
+        jest.spyOn(bookingRepository, "getBookingByUserId").mockImplementationOnce((): any => {
+            return undefined
+        })
+
+        const result = bookingService.putBooking(10, 10, 10)
+
+        expect(result).rejects.toEqual({
+            name: 'Forbidden',
+            message: 'This action violates a business rule',
+        })
+
+    })
+
+    it("Should respond with status 404 if room doenst exist", async ()=>{
+
+        jest.spyOn(bookingRepository, "getRoomById").mockImplementationOnce((): any => {
+            return undefined
+        })
+        jest.spyOn(bookingRepository, "countBookingsByRoom").mockImplementationOnce((): any => {
+            return 2;
+        })
+        jest.spyOn(bookingRepository, "getBookingByUserId").mockImplementationOnce((): any => {
+            return {
+                id: 2
+            }
+        })
+
+        const result = bookingService.putBooking(10, 10, 10)
+
+        expect(result).rejects.toEqual({
+            name: 'NotFoundError',
+            message: 'No result for this search!',
+        })
+
+    })
+
+    it("Should respond with status 403 if room is on full capacity", async ()=>{
+
+        jest.spyOn(bookingRepository, "getRoomById").mockImplementationOnce((): any => {
+            return {
+                capacity: 3
+            }
+        })
+        jest.spyOn(bookingRepository, "countBookingsByRoom").mockImplementationOnce((): any => {
+            return 3;
+        })
+        jest.spyOn(bookingRepository, "getBookingByUserId").mockImplementationOnce((): any => {
+            return {
+                id: 1
+            }
+        })
+
+        const result = bookingService.putBooking(10, 10, 10)
+
+        expect(result).rejects.toEqual({
+            name: 'Forbidden',
+            message: 'This action violates a business rule',
+        })
+
+    })
+
 })

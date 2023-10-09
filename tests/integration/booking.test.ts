@@ -121,3 +121,50 @@ describe("POST /booking", ()=> {
 
 })
 
+describe("PUT /booking/:bookingId", ()=> {
+
+    it('Should respond with status 401 if no token is given', async ()=> {
+        const result = await server.put("/booking")
+
+        expect(result.statusCode).toBe(httpStatus.UNAUTHORIZED)
+    })
+
+    it('Should respond with status 401 if given token is not valid', async () => {
+        const token = faker.lorem.word()
+
+        const result = await server.put("/booking").set('Authorization', `Bearer ${token}`);
+
+        expect(result.statusCode).toBe(httpStatus.UNAUTHORIZED)
+    })
+
+    it('Should respond with status 401 if given token doesnt match any session', async ()=>{
+        const user = await createUser()
+
+        const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET);
+
+        const result = await server.put("/booking").set('Authorization', `Bearer ${token}`);
+        expect(result.statusCode).toBe(httpStatus.UNAUTHORIZED)
+    })
+
+    describe("When token is valid", () => {
+        it("Should respond with status 200 and a valid body", async ()=>{
+            const user = await createUser()
+            const token = await generateValidToken(user)
+            const hotel = await createHotel()
+            const firstRoom = await createRoomWithHotelId(hotel.id)
+            const secondRoom = await createRoomWithHotelId(hotel.id)
+            const enrollment = await createEnrollmentWithAddress(user);
+            const ticketType = await createTicketType(false, true);
+            const ticket = await createTicket(enrollment.id, ticketType.id, TicketStatus.PAID);
+            const booking = await createBooking(user, firstRoom)
+
+            const result = await server.put(`/booking/${booking.id}`).set('Authorization', `Bearer ${token}`).send({roomId: secondRoom.id});
+
+            expect(result.statusCode).toBe(httpStatus.OK)
+            expect(result.body).toEqual({
+                bookingId: expect.any(Number)
+            })
+        })
+    })
+
+})
